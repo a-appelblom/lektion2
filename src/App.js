@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Card from "./components/Card";
+import Map from "./components/Map";
 
 function App() {
   const [ready, setReady] = useState(true);
@@ -9,6 +10,8 @@ function App() {
   const [prevCard, setPrevCard] = useState({});
   const [loading, setLoading] = useState(false);
   const [deck, setDeck] = useState({});
+  const [deck2, setDeck2] = useState({});
+  const [lottsaCards, setLottsaCards] = useState([]);
   const [score, setScore] = useState(0);
 
   useEffect(() => {
@@ -19,7 +22,13 @@ function App() {
       );
       const data = await res.json();
 
+      const res2 = await fetch("http://localhost:3000/api/hello");
+      const data2 = await res2.json();
+
+      console.log(data2);
+
       setDeck(data);
+      setDeck2(data);
       setLoading(false);
     }
     getData();
@@ -36,6 +45,18 @@ function App() {
 
     deck.deck_id && fetchCard();
   }, [deck]);
+
+  useEffect(() => {
+    async function fetchCard() {
+      const res = await fetch(
+        `https://deckofcardsapi.com/api/deck/${deck2.deck_id}/draw/?count=12`
+      );
+      const data = await res.json();
+      setLottsaCards(data.cards);
+    }
+
+    deck2.deck_id && fetchCard();
+  }, [deck2]);
 
   useEffect(() => {
     // console.log("deck", deck);
@@ -151,6 +172,7 @@ function App() {
           )}
         </div>
       </div>
+      <Map cards={lottsaCards} />
     </div>
   );
 }
